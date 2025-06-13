@@ -1,0 +1,52 @@
+ips/ids:
+
+تنصيب Snort (للكشف):
+# على جهاز جديد (مثلاً 192.168.100.200)
+sudo apt update
+sudo apt install snort -y
+
+تكوين Snort:
+sudo nano /etc/snort/snort.conf
+
+القواعد المهمة:
+include $RULE_PATH/local.rules
+
+إنشاء قاعدة مخصصة لاكتشاف هجوم MITM:
+echo 'alert tcp any any -> any any (msg:"Possible MITM Attack"; content:"ARP"; sid:1000001; rev:1;)' | sudo tee -a /etc/snort/rules/local.rules
+
+تشغيل Snort:
+sudo snort -A console -q -c /etc/snort/snort.conf -i eth0
+
+
+
+-----------------------------------
+suricata:
+# تنصيب Suricata
+sudo apt install suricata -y
+
+# تحديث القواعد
+sudo suricata-update
+
+# تشغيل Suricata (وضع IPS يتطلب تكوين إضافي)
+sudo suricata -c /etc/suricata/suricata.yaml -i eth0
+
+
+ربط النظام بالشبكة:
+لوضع IDS (كشف فقط):
+
+اضبط Port Mirroring على السويتش ليرسل حركة الشبكة إلى Snort/Suricata.
+
+لوضع IPS (منع الهجمات):
+
+اجعل السيرفر بين الشبكة والإنترنت (مثل Gateway).
+
+استخدم iptables لكتابة قواعد منع:
+
+bash
+# مثال: منع أي محاولة MITM من IP المهاجم
+sudo iptables -A INPUT -s 192.168.100.100 -j DROP
+
+
+
+
+

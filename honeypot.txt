@@ -1,0 +1,73 @@
+honypot:
+
+# تحديث النظام
+sudo apt update && sudo apt upgrade -y
+
+# تثبيت الحزم الأساسية
+sudo apt install -y git python3-pip fail2ban
+
+# إنشاء مستخدم جديد لتشغيل الـ honeypot
+sudo adduser --disabled-password cowrie
+
+# الانتقال إلى دليل المستخدم
+cd /home/cowrie
+
+# تنزيل Cowrie
+sudo -u cowrie git clone https://github.com/cowrie/cowrie.git
+
+# تثبيت المتطلبات
+cd cowrie
+sudo -u cowrie pip install -r requirements.txt
+
+# نسخ ملف التكوين الافتراضي
+sudo -u cowrie cp etc/cowrie.cfg.dist etc/cowrie.cfg
+
+# تعديل ملف التكوين
+sudo -u cowrie nano etc/cowrie.cfg
+
+انشاء بيئة افتراضية:
+sudo -u cowrie python3 -m venv /home/cowrie/cowrie-env
+sudo -u cowrie /home/cowrie/cowrie-env/bin/pip install -r /home/cowrie/cowrie/requirements.txt
+
+sudo apt update
+sudo apt install python3.12-venv
+
+انشاء بيئة:
+sudo -u cowrie python3 -m venv /home/cowrie/cowrie-env
+
+تنشيط وتثبيت البيئة:
+sudo -u cowrie /home/cowrie/cowrie-env/bin/pip install --upgrade pip
+sudo -u cowrie /home/cowrie/cowrie-env/bin/pip install -r /home/cowrie/cowrie/requirements.txt
+
+تعديل ملف تشغيل Cowrie لاستخدام البيئة الافتراضية:
+sudo -u cowrie nano /home/cowrie/cowrie/bin/cowrie
+
+تشغيل cowrie:
+# الانتقال إلى الدليل
+cd /home/cowrie/cowrie
+
+# التشغيل كمستخدم cowrie
+sudo -u cowrie bin/cowrie start
+
+تحويل المنافذ :
+ تشغيل Honeypot على المنفذ 22 بينما SSH الحقيقي على منفذ آخر:
+
+bash
+# تغيير منفذ SSH الحقيقي
+sudo nano /etc/ssh/sshd_config
+غير Port 22 إلى Port 2222 ثم:
+
+bash
+sudo systemctl restart sshd
+
+# إعداد تحويل المنفذ
+sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+
+جدار ناري للمنفذ الجديد
+sudo ufw allow 2222/tcp
+sudo ufw enable
+
+
+
+
